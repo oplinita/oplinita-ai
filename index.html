@@ -110,6 +110,7 @@
         }
         .hidden { display: none; }
         .error-msg { color: #f87171; font-weight: bold; }
+        .warning-msg { color: #fbbf24; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -150,8 +151,11 @@
     </div>
 </div>
 <script>
-    // Clave API de Gemini (debe ser una clave válida de Google AI Studio)
-    const apiKey = ""; 
+    // ==========================================
+    // CONFIGURACIÓN DE SEGURIDAD
+    // Pega tu clave de Google AI Studio entre las comillas abajo:
+    const apiKey = "AIzaSyDhUYwJqFtx1QRifGlJnLonJR8OqQ-RYmk"; 
+    // ==========================================
 
     function switchTab(type, btn) {
         document.getElementById('panel-video').classList.add('hidden');
@@ -162,13 +166,20 @@
         btn.classList.add('active');
     }
 
-    // Función con reintentos y manejo de errores profesional
     async function llamarIA(tipo) {
         const out = document.getElementById('output');
         const inputVal = document.getElementById('in-' + tipo).value;
         const btn = document.getElementById('btn-' + tipo);
 
-        if (!inputVal) return;
+        if (!apiKey || apiKey === "TU_CLAVE_AQUÍ") {
+            out.innerHTML = "<span class='warning-msg'>Error: Debes poner tu API KEY en la línea 131 del código.</span>";
+            return;
+        }
+
+        if (!inputVal) {
+            out.innerText = "Por favor, escribe algo primero.";
+            return;
+        }
         
         btn.disabled = true;
         out.innerHTML = "Oplinita está pensando...";
@@ -185,7 +196,7 @@
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-        const fetchWithRetry = async (retries = 5, delay = 1000) => {
+        const fetchWithRetry = async (retries = 3, delay = 1000) => {
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -193,11 +204,12 @@
                     body: JSON.stringify(payload)
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
+                    throw new Error(data.error?.message || `Error ${response.status}`);
                 }
 
-                const data = await response.json();
                 return data.candidates?.[0]?.content?.parts?.[0]?.text;
             } catch (error) {
                 if (retries > 0) {
@@ -213,10 +225,10 @@
             if (result) {
                 out.innerText = result;
             } else {
-                out.innerHTML = "<span class='error-msg'>No se pudo obtener respuesta de la IA.</span>";
+                out.innerHTML = "<span class='error-msg'>La IA no pudo generar texto. Intenta de nuevo.</span>";
             }
         } catch (e) {
-            out.innerHTML = `<span class='error-msg'>Error de conexión persistente. Verifica que la API Key esté configurada y que tengas conexión a internet.</span>`;
+            out.innerHTML = `<span class='error-msg'>Error: ${e.message}. Asegúrate de que tu clave es válida y que Google AI Studio no tiene restricciones en tu país.</span>`;
         } finally {
             btn.disabled = false;
         }
