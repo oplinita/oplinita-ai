@@ -92,6 +92,10 @@
             text-transform: uppercase; 
             letter-spacing: 1px; 
         }
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .result-box { 
             background: #020617; 
             border: 1px solid var(--border); 
@@ -105,6 +109,7 @@
             color: #cbd5e1; 
         }
         .hidden { display: none; }
+        .error-msg { color: #f87171; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -123,17 +128,17 @@
             <div id="panel-video">
                 <h2 style="font-size: 18px; margin-bottom: 15px;">YouTube</h2>
                 <textarea id="in-video" class="input-area" rows="8" placeholder="Pega el guion..."></textarea>
-                <button class="action-btn" onclick="llamarIA('video')">Procesar</button>
+                <button class="action-btn" id="btn-video" onclick="llamarIA('video')">Procesar</button>
             </div>
             <div id="panel-musica" class="hidden">
                 <h2 style="font-size: 18px; margin-bottom: 15px;">Música</h2>
                 <textarea id="in-musica" class="input-area" rows="4" placeholder="Tema de la canción..."></textarea>
-                <button class="action-btn" onclick="llamarIA('musica')">Escribir</button>
+                <button class="action-btn" id="btn-musica" onclick="llamarIA('musica')">Escribir</button>
             </div>
             <div id="panel-arte" class="hidden">
                 <h2 style="font-size: 18px; margin-bottom: 15px;">Arte AI</h2>
                 <textarea id="in-arte" class="input-area" rows="4" placeholder="Describe la imagen..."></textarea>
-                <button class="action-btn" onclick="llamarIA('arte')">Crear Prompt</button>
+                <button class="action-btn" id="btn-arte" onclick="llamarIA('arte')">Crear Prompt</button>
             </div>
         </div>
         <div>
@@ -145,8 +150,8 @@
     </div>
 </div>
 <script>
-    // Clave API de Gemini
-    const API_KEY = ""; // La clave se inyectará automáticamente en el entorno seguro
+    // Clave API de Gemini (debe ser una clave válida de Google AI Studio)
+    const apiKey = ""; 
 
     function switchTab(type, btn) {
         document.getElementById('panel-video').classList.add('hidden');
@@ -157,38 +162,63 @@
         btn.classList.add('active');
     }
 
+    // Función con reintentos y manejo de errores profesional
     async function llamarIA(tipo) {
         const out = document.getElementById('output');
         const inputVal = document.getElementById('in-' + tipo).value;
+        const btn = document.getElementById('btn-' + tipo);
+
         if (!inputVal) return;
         
+        btn.disabled = true;
         out.innerHTML = "Oplinita está pensando...";
         
-        let instr = "";
-        if(tipo === 'video') instr = "Eres un experto en YouTube. Genera 3 títulos virales, una descripción con emojis y hashtags basados en el texto que te den.";
-        if(tipo === 'musica') instr = "Eres un compositor de canciones infantiles. Escribe una letra divertida, educativa y con rima sobre el tema dado.";
-        if(tipo === 'arte') instr = "Eres un experto en prompts de arte IA. Crea un prompt detallado para Midjourney o Dall-E (estilo Pixar, 8k, cinematográfico).";
+        let systemPrompt = "";
+        if(tipo === 'video') systemPrompt = "Eres un experto en YouTube. Genera 3 títulos virales, una descripción con emojis y hashtags basados en el texto proporcionado.";
+        if(tipo === 'musica') systemPrompt = "Eres un compositor de canciones infantiles. Escribe una letra divertida, educativa y con rima sobre el tema dado.";
+        if(tipo === 'arte') systemPrompt = "Eres un experto en prompts de arte IA. Crea un prompt detallado para Midjourney o Dall-E (estilo Pixar, 8k, cinematográfico).";
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
+        const payload = {
+            contents: [{ parts: [{ text: inputVal }] }],
+            systemInstruction: { parts: [{ text: systemPrompt }] }
+        };
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        const fetchWithRetry = async (retries = 5, delay = 1000) => {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text;
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithRetry(retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        };
 
         try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: inputVal }] }],
-                    systemInstruction: { parts: [{ text: instr }] }
-                })
-            });
-
-            const data = await response.json();
-            if (data.candidates && data.candidates[0].content.parts[0].text) {
-                out.innerText = data.candidates[0].content.parts[0].text;
+            const result = await fetchWithRetry();
+            if (result) {
+                out.innerText = result;
             } else {
-                out.innerText = "La IA no pudo generar una respuesta. Intenta con otro texto.";
+                out.innerHTML = "<span class='error-msg'>No se pudo obtener respuesta de la IA.</span>";
             }
         } catch (e) {
-            out.innerText = "Error de conexión. Revisa que el nombre del archivo sea index.html y que GitHub Pages esté activo.";
+            out.innerHTML = `<span class='error-msg'>Error de conexión persistente. Verifica que la API Key esté configurada y que tengas conexión a internet.</span>`;
+        } finally {
+            btn.disabled = false;
         }
     }
 </script>
