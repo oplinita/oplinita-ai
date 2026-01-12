@@ -3,23 +3,32 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Oplinita AI Pro | Estación de Trabajo</title>
-    <!-- Importación de fuente corregida -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Oplinita AI Pro | Multiverse Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg-color: #020617; 
-            --card-bg: #0f172a; 
-            --primary: #3b82f6; 
-            --secondary: #7c3aed; 
-            --text-main: #f8fafc; 
+            --bg-color: #020205; 
+            --card-bg: #0b0d17; 
+            --accent: #00f2ff; 
+            --accent-purple: #9d00ff; 
+            --text-main: #ffffff; 
             --text-muted: #94a3b8; 
             --border: #1e293b; 
+            --glass: rgba(255, 255, 255, 0.02);
+            --danger: #ff4757;
+            --success: #2ed573;
+            --warning: #ffa502;
         }
+
+        * { box-sizing: border-box; transition: all 0.25s ease; }
+
         body { 
             background-color: var(--bg-color); 
+            background-image: 
+                radial-gradient(circle at 5% 5%, rgba(0, 242, 255, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 95% 95%, rgba(157, 0, 255, 0.08) 0%, transparent 25%);
             color: var(--text-main); 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-family: 'Outfit', sans-serif; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -27,210 +36,354 @@
             padding: 20px; 
             margin: 0; 
         }
+
         #oplinita-root { 
             background-color: var(--card-bg); 
             width: 100%; 
-            max-width: 1000px; 
+            max-width: 1300px; 
+            min-height: 90vh;
             padding: 40px; 
-            border-radius: 24px; 
+            border-radius: 40px; 
             border: 1px solid var(--border); 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
         }
-        .tabs { 
-            display: flex; 
-            justify-content: center; 
-            gap: 12px; 
-            margin-bottom: 30px; 
-            background: rgba(255,255,255,0.03); 
-            padding: 8px; 
-            border-radius: 16px; 
-        }
-        .tab-btn { 
-            background: transparent; 
+
+        header { text-align: left; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+        header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 32px; margin: 0; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header p { color: var(--text-muted); font-size: 14px; margin: 5px 0 0 0; }
+
+        /* Navegación por Módulos */
+        .module-nav { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 30px; }
+        .nav-item { 
+            background: var(--glass); 
+            border: 1px solid var(--border); 
             color: var(--text-muted); 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 12px; 
+            padding: 12px 5px; 
+            border-radius: 18px; 
             cursor: pointer; 
-            font-weight: 600; 
-            transition: 0.3s; 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
         }
-        .tab-btn.active { 
-            background: var(--primary); 
-            color: white; 
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); 
-        }
-        .grid-layout { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 30px; 
-        }
-        @media (max-width: 768px) { 
-            .grid-layout { grid-template-columns: 1fr; } 
-        }
-        .input-area { 
-            background: #020617; 
+        .nav-item span { font-size: 18px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: var(--accent); }
+        .nav-item.active { background: var(--text-main); color: var(--bg-color); border-color: var(--text-main); box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+
+        .grid-layout { display: grid; grid-template-columns: 420px 1fr; gap: 30px; flex-grow: 1; }
+        @media (max-width: 1050px) { .grid-layout { grid-template-columns: 1fr; } }
+
+        /* Área de Trabajo */
+        .workspace { display: flex; flex-direction: column; gap: 20px; }
+        .module-info h2 { font-size: 20px; margin: 0 0 5px 0; color: var(--accent); }
+        .module-info p { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+        .label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
+        
+        .input-area, select { 
+            background: #000; 
             border: 1px solid var(--border); 
             color: var(--text-main); 
             width: 100%; 
             padding: 16px; 
-            border-radius: 14px; 
-            margin-bottom: 20px; 
+            border-radius: 18px; 
             font-size: 14px; 
-            resize: none; 
-            box-sizing: border-box; 
+            line-height: 1.6; 
+            outline: none;
         }
-        .action-btn { 
-            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
-            color: white; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 14px; 
-            width: 100%; 
-            font-weight: 800; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-        }
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .result-box { 
-            background: #020617; 
+        .input-area:focus { border-color: var(--accent); }
+
+        .action-bar { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 10px; }
+        .btn { border: none; padding: 16px; border-radius: 18px; font-weight: 800; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-clear { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid rgba(255, 71, 87, 0.15); }
+        .btn-primary { background: var(--text-main); color: var(--bg-color); }
+
+        /* Calendario Independiente */
+        .challenge-container { background: #000; padding: 20px; border-radius: 22px; border: 1px solid var(--border); }
+        .challenge-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+        .day-box { 
+            aspect-ratio: 1; 
+            background: var(--glass); 
             border: 1px solid var(--border); 
-            border-radius: 14px; 
-            padding: 20px; 
-            min-height: 300px; 
-            max-height: 500px; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 11px; 
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .day-box.completed { background: var(--success); color: var(--bg-color); border-color: var(--success); box-shadow: 0 0 10px rgba(46, 213, 115, 0.3); }
+
+        /* Resultados */
+        .output-wrapper { 
+            background: var(--glass); 
+            border: 1px solid var(--border); 
+            border-radius: 32px; 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            overflow: hidden;
+        }
+        .output-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .output-header span { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--accent-purple); text-transform: uppercase; }
+        
+        .result-content { 
+            flex-grow: 1; 
             overflow-y: auto; 
             white-space: pre-wrap; 
             font-size: 14px; 
-            color: #cbd5e1; 
+            line-height: 1.7; 
+            color: #e2e8f0; 
+            scrollbar-width: thin;
         }
-        .hidden { display: none; }
-        .error-msg { color: #f87171; font-weight: bold; }
-        .warning-msg { color: #fbbf24; font-weight: bold; }
+
+        .loader { width: 16px; height: 16px; border: 2px solid var(--bg-color); border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 0.8s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .hidden { display: none !important; }
+        .status-badge { display: flex; align-items: center; font-size: 10px; color: var(--success); font-weight: bold; gap: 6px; }
+        .dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
+        
+        .user-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); font-size: 10px; color: var(--text-muted); display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
+
 <div id="oplinita-root">
-    <header style="text-align: center; margin-bottom: 30px;">
-        <h1 style="font-size: 32px; font-weight: 800;">OPLINITA <span style="color: #3b82f6; font-style: italic;">AI</span></h1>
-        <p style="color: var(--text-muted); font-size: 12px;">Workstation Pro v9.0</p>
-    </header>
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('video', this)">YouTube</button>
-        <button class="tab-btn" onclick="switchTab('musica', this)">Música</button>
-        <button class="tab-btn" onclick="switchTab('arte', this)">Arte AI</button>
-    </div>
-    <div class="grid-layout">
+    <header>
         <div>
-            <div id="panel-video">
-                <h2 style="font-size: 18px; margin-bottom: 15px;">YouTube</h2>
-                <textarea id="in-video" class="input-area" rows="8" placeholder="Pega el guion..."></textarea>
-                <button class="action-btn" id="btn-video" onclick="llamarIA('video')">Procesar</button>
+            <h1>OPLINITA PRO</h1>
+            <p>Multiverse AI Creative Studio</p>
+        </div>
+        <div class="status-badge">
+            <div class="dot"></div> MODO COLABORATIVO ACTIVO
+        </div>
+    </header>
+
+    <nav class="module-nav">
+        <div class="nav-item active" onclick="switchModule('youtube', this)">
+            <span>📺</span> YouTube
+        </div>
+        <div class="nav-item" onclick="switchModule('musica', this)">
+            <span>🎵</span> Música
+        </div>
+        <div class="nav-item" onclick="switchModule('social', this)">
+            <span>📱</span> Redes
+        </div>
+        <div class="nav-item" onclick="switchModule('thumbnail', this)">
+            <span>🖼️</span> Miniatura
+        </div>
+        <div class="nav-item" onclick="switchModule('strategy', this)">
+            <span>🚀</span> Estrategia
+        </div>
+        <div class="nav-item" onclick="switchModule('challenge', this)">
+            <span>🔥</span> Mi Reto
+        </div>
+    </nav>
+
+    <div class="grid-layout">
+        <div class="workspace">
+            <div class="module-info">
+                <h2 id="mod-title">YouTube Expert</h2>
+                <p id="mod-desc">Metadatos SEO a partir de un título.</p>
             </div>
-            <div id="panel-musica" class="hidden">
-                <h2 style="font-size: 18px; margin-bottom: 15px;">Música</h2>
-                <textarea id="in-musica" class="input-area" rows="4" placeholder="Tema de la canción..."></textarea>
-                <button class="action-btn" id="btn-musica" onclick="llamarIA('musica')">Escribir</button>
+
+            <!-- Entrada Principal -->
+            <div id="input-container" class="input-wrapper">
+                <span class="label" id="input-label">Título o Tema</span>
+                <textarea id="main-input" class="input-area" style="min-height: 150px;" placeholder="Ingresa los datos..."></textarea>
             </div>
-            <div id="panel-arte" class="hidden">
-                <h2 style="font-size: 18px; margin-bottom: 15px;">Arte AI</h2>
-                <textarea id="in-arte" class="input-area" rows="4" placeholder="Describe la imagen..."></textarea>
-                <button class="action-btn" id="btn-arte" onclick="llamarIA('arte')">Crear Prompt</button>
+
+            <!-- Selectores Específicos -->
+            <div id="social-selector" class="hidden">
+                <span class="label">Plataforma</span>
+                <select id="network-select">
+                    <option value="instagram">Instagram (Reels/Post)</option>
+                    <option value="facebook">Facebook (Post Largo)</option>
+                    <option value="tiktok">TikTok (Viral Script)</option>
+                </select>
+            </div>
+
+            <div id="strategy-selector" class="hidden">
+                <span class="label">Opción Estratégica</span>
+                <select id="strat-type-select">
+                    <option value="horarios">Mejores Horarios de Publicación</option>
+                    <option value="temas">Temas de Información Valiosa</option>
+                    <option value="ganchos">Ganchos (Hooks) de Retención</option>
+                </select>
+            </div>
+
+            <!-- Módulo de Reto -->
+            <div id="challenge-section" class="hidden">
+                <div class="challenge-container">
+                    <span class="label">Calendario Compartido (30 Días)</span>
+                    <div class="challenge-grid" id="calendar-grid"></div>
+                </div>
+                <div class="input-wrapper" style="margin-top:15px;">
+                    <span class="label">Notas de Avance del Equipo</span>
+                    <textarea id="challenge-notes" class="input-area" style="min-height: 80px;" placeholder="¿Qué logramos hoy? Comparte avances con tu familiar..."></textarea>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-clear" onclick="clearAll()">Borrar</button>
+                <button class="btn btn-primary" id="exec-btn" onclick="processAI()">
+                    <span id="btn-text">Generar para el Equipo</span>
+                </button>
+            </div>
+
+            <div class="user-footer">
+                <span id="user-id-display">ID DE EQUIPO: CARGANDO...</span>
+                <span>v1.5 PRO COLAB</span>
             </div>
         </div>
-        <div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span style="font-size: 11px; font-weight: bold; color: var(--text-muted);">RESULTADO</span>
+
+        <div class="output-wrapper">
+            <div class="output-header">
+                <span id="output-tag">CONTENIDO PARA EL PROYECTO</span>
+                <button onclick="copyResult()" style="background: none; border: none; color: var(--accent); font-size: 10px; font-weight: 900; cursor: pointer;">COPIAR TEXTO</button>
             </div>
-            <div class="result-box" id="output">Esperando datos...</div>
+            <div id="result-box" class="result-content">Configura tu módulo y haz clic en "Generar para el Equipo".</div>
         </div>
     </div>
 </div>
-<script>
-    // ==========================================
-    // CONFIGURACIÓN DE SEGURIDAD
-    // Pega tu clave de Google AI Studio entre las comillas abajo:
-    const apiKey = "AIzaSyDhUYwJqFtx1QRifGlJnLonJR8OqQ-RYmk"; 
-    // ==========================================
 
-    function switchTab(type, btn) {
-        document.getElementById('panel-video').classList.add('hidden');
-        document.getElementById('panel-musica').classList.add('hidden');
-        document.getElementById('panel-arte').classList.add('hidden');
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('panel-' + type).classList.remove('hidden');
-        btn.classList.add('active');
+<script>
+    const apiKey = ""; // La llave se conecta al ejecutar
+    let activeModule = 'youtube';
+
+    // Generar un ID de sesión simple para simular trabajo en equipo
+    const sessionId = Math.random().toString(36).substring(7).toUpperCase();
+    document.getElementById('user-id-display').innerText = "ID DE EQUIPO: " + sessionId;
+
+    const modules = {
+        'youtube': {
+            title: 'YouTube Expert',
+            desc: 'SEO y metadatos profesionales para el canal.',
+            label: 'Título del Video del Equipo',
+            prompt: 'Experto en YouTube. Genera descripción con emojis y hashtags para el video:'
+        },
+        'musica': {
+            title: 'Edu-Música Studio',
+            desc: 'Letras para nuestras canciones infantiles.',
+            label: 'Tema de nuestra canción',
+            prompt: 'Compositor infantil. Crea una letra rítmica para niños sobre:'
+        },
+        'social': {
+            title: 'Social Media Colab',
+            desc: 'Posts listos para nuestras redes.',
+            label: 'Idea del contenido grupal',
+            prompt: '' 
+        },
+        'thumbnail': {
+            title: 'Thumbnail Master',
+            desc: 'Instrucciones para crear la miniatura.',
+            label: 'Contexto visual para la miniatura',
+            prompt: 'Crea un prompt detallado para una miniatura viral sobre:'
+        },
+        'strategy': {
+            title: 'Estrategia de Crecimiento',
+            desc: 'Plan de acción para el proyecto.',
+            label: 'Nicho del Proyecto Familiar',
+            prompt: ''
+        },
+        'challenge': {
+            title: 'Reto 30 Días en Equipo',
+            desc: 'Planificador de constancia compartido.',
+            label: 'Meta del Reto (Ej: Crecer 100 seguidores juntos)',
+            prompt: 'Coach de éxito. Crea un plan de 30 días para un equipo que tiene este objetivo:'
+        }
+    };
+
+    function initCalendar() {
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+        for (let i = 1; i <= 30; i++) {
+            const day = document.createElement('div');
+            day.className = 'day-box';
+            day.innerText = i;
+            day.onclick = () => day.classList.toggle('completed');
+            grid.appendChild(day);
+        }
     }
 
-    async function llamarIA(tipo) {
-        const out = document.getElementById('output');
-        const inputVal = document.getElementById('in-' + tipo).value;
-        const btn = document.getElementById('btn-' + tipo);
+    function switchModule(mod, el) {
+        activeModule = mod;
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
 
-        if (!apiKey || apiKey === "TU_CLAVE_AQUÍ") {
-            out.innerHTML = "<span class='warning-msg'>Error: Debes poner tu API KEY en la línea 131 del código.</span>";
-            return;
-        }
-
-        if (!inputVal) {
-            out.innerText = "Por favor, escribe algo primero.";
-            return;
-        }
+        const m = modules[mod];
+        document.getElementById('mod-title').innerText = m.title;
+        document.getElementById('mod-desc').innerText = m.desc;
+        document.getElementById('input-label').innerText = m.label;
         
-        btn.disabled = true;
-        out.innerHTML = "Oplinita está pensando...";
+        document.getElementById('social-selector').classList.toggle('hidden', mod !== 'social');
+        document.getElementById('strategy-selector').classList.toggle('hidden', mod !== 'strategy');
+        document.getElementById('challenge-section').classList.toggle('hidden', mod !== 'challenge');
         
-        let systemPrompt = "";
-        if(tipo === 'video') systemPrompt = "Eres un experto en YouTube. Genera 3 títulos virales, una descripción con emojis y hashtags basados en el texto proporcionado.";
-        if(tipo === 'musica') systemPrompt = "Eres un compositor de canciones infantiles. Escribe una letra divertida, educativa y con rima sobre el tema dado.";
-        if(tipo === 'arte') systemPrompt = "Eres un experto en prompts de arte IA. Crea un prompt detallado para Midjourney o Dall-E (estilo Pixar, 8k, cinematográfico).";
+        if(mod === 'challenge') initCalendar();
+        document.getElementById('result-box').innerText = "Módulo " + m.title + " activado para el equipo.";
+    }
 
-        const payload = {
-            contents: [{ parts: [{ text: inputVal }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] }
-        };
+    function clearAll() {
+        document.getElementById('main-input').value = "";
+        document.getElementById('challenge-notes').value = "";
+    }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    function copyResult() {
+        const text = document.getElementById('result-box').innerText;
+        navigator.clipboard.writeText(text);
+        const tag = document.getElementById('output-tag');
+        tag.innerText = "¡COPIADO!";
+        setTimeout(() => tag.innerText = "CONTENIDO PARA EL PROYECTO", 2000);
+    }
 
-        const fetchWithRetry = async (retries = 3, delay = 1000) => {
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+    async function processAI() {
+        const input = document.getElementById('main-input').value;
+        const out = document.getElementById('result-box');
+        const btnText = document.getElementById('btn-text');
 
-                const data = await response.json();
+        if(!input.trim() && activeModule !== 'challenge') return;
 
-                if (!response.ok) {
-                    throw new Error(data.error?.message || `Error ${response.status}`);
-                }
+        btnText.innerHTML = '<span class="loader"></span> Procesando...';
+        out.innerText = "Consultando con la central de Oplinita...";
 
-                return data.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (error) {
-                if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return fetchWithRetry(retries - 1, delay * 2);
-                }
-                throw error;
-            }
-        };
+        let finalPrompt = modules[activeModule].prompt;
+        
+        if(activeModule === 'social') {
+            const net = document.getElementById('network-select').value;
+            finalPrompt = `Experto en redes. Crea un post para ${net} listo para publicar para:`;
+        } else if(activeModule === 'strategy') {
+            const type = document.getElementById('strat-type-select').value;
+            if(type === 'horarios') finalPrompt = "Dame horarios y tips de publicación para el equipo en el nicho:";
+            else if(type === 'temas') finalPrompt = "Dime 5 temas de alto valor para educar en el nicho:";
+            else finalPrompt = "Crea 5 ganchos irresistibles para atraer gente a:";
+        }
 
         try {
-            const result = await fetchWithRetry();
-            if (result) {
-                out.innerText = result;
-            } else {
-                out.innerHTML = "<span class='error-msg'>La IA no pudo generar texto. Intenta de nuevo.</span>";
-            }
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: input || "Objetivo de reto compartido" }] }],
+                    systemInstruction: { parts: [{ text: finalPrompt + " Sé muy práctico, profesional y fomenta el trabajo en equipo." }] }
+                })
+            });
+
+            const data = await response.json();
+            out.innerText = data.candidates[0].content.parts[0].text;
         } catch (e) {
-            out.innerHTML = `<span class='error-msg'>Error: ${e.message}. Asegúrate de que tu clave es válida y que Google AI Studio no tiene restricciones en tu país.</span>`;
+            out.innerText = "Error: Sin conexión al servidor central.";
         } finally {
-            btn.disabled = false;
+            btnText.innerText = "Generar para el Equipo";
         }
     }
 </script>
